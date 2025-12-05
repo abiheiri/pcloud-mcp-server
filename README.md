@@ -4,7 +4,9 @@ An MCP (Model Context Protocol) server that provides tools for interacting with 
 
 ## Features
 
-- This project is still ongoing, at the moment all it does is list folder contents.
+- List folder contents
+- Download files to local system (async with progress tracking)
+- Download entire folders with all contents (preserves directory structure)
 
 ## Installation
 
@@ -67,28 +69,18 @@ Replace:
 - `/path/to/pcloud_mcp` with the actual path to this repository
 - Credentials with your actual pCloud account details
 
-## Available Tools
+## What You Can Do
 
-### list_folder
+Once configured, just ask Claude things like:
 
-List the contents of a folder in pCloud.
+- "Show me what's in my pCloud"
+- "List all files in my Documents folder"
+- "Download report.pdf to my Downloads folder"
+- "Download my entire Photos folder"
+- "What's the download progress?"
+- "Cancel that download"
 
-**Parameters:**
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `folder_id` | int | 0 | The folder ID to list (0 = root folder) |
-| `path` | string | null | Alternative: path to the folder |
-| `recursive` | bool | false | Return full directory tree |
-| `show_deleted` | bool | false | Show deleted files that can be restored |
-| `no_files` | bool | false | Return only folder structure |
-| `no_shares` | bool | false | Exclude shared content |
-
-**Example usage in Claude:**
-
-- "List my pCloud root folder"
-- "Show me all files in my Documents folder recursively"
-- "List folder ID 12345"
+Downloads happen in the background, so you can keep chatting while files transfer.
 
 ## Authentication
 
@@ -115,24 +107,4 @@ python -c "from pcloud import mcp; print('Server:', mcp.name)"
 
 ## License
 
-MIT License
-
-Copyright (c) 2025 AL Biheiri
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+[MIT License](LICENSE)
