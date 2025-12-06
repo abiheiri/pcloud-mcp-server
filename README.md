@@ -7,6 +7,9 @@ An MCP (Model Context Protocol) server that provides tools for interacting with 
 - List folder contents
 - Download files to local system (async with progress tracking)
 - Download entire folders with all contents (preserves directory structure)
+- Upload files to pCloud (async with progress tracking)
+- Upload entire folders (auto-creates remote directories)
+- Conflict handling for uploads: skip, overwrite, or rename existing files
 
 ## Installation
 
@@ -77,10 +80,12 @@ Once configured, just ask Claude things like:
 - "List all files in my Documents folder"
 - "Download report.pdf to my Downloads folder"
 - "Download my entire Photos folder"
-- "What's the download progress?"
-- "Cancel that download"
+- "Upload this file to my pCloud backup folder"
+- "Upload my project folder to pCloud"
+- "What's the upload progress?"
+- "Cancel that transfer"
 
-Downloads happen in the background, so you can keep chatting while files transfer.
+Transfers happen in the background, so you can keep chatting while files upload or download.
 
 ## Authentication
 
