@@ -54,7 +54,7 @@ Add the following to your Claude Desktop configuration file:
         "--directory",
         "/path/to/pcloud_mcp",
         "run",
-        "pcloud.py"
+        "pcloud-mcp"
       ],
       "env": {
         "PCLOUD_USERNAME": "youremail@example.com",
@@ -100,14 +100,13 @@ The server uses pCloud's token authentication:
 Run the server directly:
 
 ```bash
-source .venv/bin/activate
-python pcloud.py
+uv run pcloud-mcp
 ```
 
 Test the imports:
 
 ```bash
-python -c "from pcloud import mcp; print('Server:', mcp.name)"
+uv run python -c "from pcloud_mcp import mcp; print('Server:', mcp.name)"
 ```
 
 ## License
