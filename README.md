@@ -5,11 +5,10 @@ An MCP (Model Context Protocol) server that provides tools for interacting with 
 ## Features
 
 - List folder contents
-- Download files to local system (async with progress tracking)
-- Download entire folders with all contents (preserves directory structure)
-- Upload files to pCloud (async with progress tracking)
-- Upload entire folders (auto-creates remote directories)
-- Conflict handling for uploads: skip, overwrite, or rename existing files
+- Download files and folders to your local system
+- Upload files and folders to pCloud
+- Rename, move, and delete files and folders
+- Manage trash (list and restore deleted items)
 
 ## Installation
 
@@ -82,18 +81,13 @@ Once configured, just ask Claude things like:
 - "Download my entire Photos folder"
 - "Upload this file to my pCloud backup folder"
 - "Upload my project folder to pCloud"
-- "What's the upload progress?"
-- "Cancel that transfer"
+- "Rename my old folder to something new"
+- "Move this file to another folder"
+- "Delete that folder"
+- "What's in my trash?"
+- "Restore that deleted file"
 
-Transfers happen in the background, so you can keep chatting while files upload or download.
-
-## Authentication
-
-The server uses pCloud's token authentication:
-
-1. Credentials are read from environment variables on first API call
-2. Token is cached in memory for the session duration
-3. On auth errors (expired token), the token is automatically regenerated
+Transfers run in the background, so you can keep chatting while files upload or download.
 
 ## Development
 
