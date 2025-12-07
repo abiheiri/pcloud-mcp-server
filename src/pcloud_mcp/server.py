@@ -532,3 +532,308 @@ async def cancel_upload(upload_id: str) -> dict[str, Any]:
             "success": False,
             "error": f"Upload '{upload_id}' not found",
         }
+
+
+# =============================================================================
+# Folder Operations (rename, move, delete)
+# =============================================================================
+
+
+@mcp.tool()
+async def rename_folder(
+    folder_id: int | None = None,
+    path: str | None = None,
+    new_name: str | None = None,
+    to_path: str | None = None,
+    to_folder_id: int | None = None,
+) -> dict[str, Any]:
+    """
+    Rename or move a folder in pCloud.
+
+    You can rename a folder, move it to a different location, or both at once.
+
+    Args:
+        folder_id: The folder ID to rename/move
+        path: The folder path to rename/move (alternative to folder_id)
+        new_name: New name for the folder (for renaming)
+        to_path: Destination path (for moving). Must end with "/" if just moving.
+        to_folder_id: Destination folder ID (for moving)
+
+    Returns:
+        Dictionary with the updated folder metadata
+
+    Examples:
+        Rename: rename_folder(folder_id=123, new_name="New Name")
+        Move: rename_folder(folder_id=123, to_folder_id=456)
+        Both: rename_folder(path="/Old Folder", new_name="New Name", to_path="/Destination/")
+    """
+    if folder_id is None and path is None:
+        return {"error": "Either folder_id or path must be provided"}
+
+    if new_name is None and to_path is None and to_folder_id is None:
+        return {"error": "At least one destination parameter required: new_name, to_path, or to_folder_id"}
+
+    params: dict[str, Any] = {}
+
+    if folder_id is not None:
+        params["folderid"] = folder_id
+    else:
+        params["path"] = path
+
+    if new_name is not None:
+        params["toname"] = new_name
+    if to_path is not None:
+        params["topath"] = to_path
+    if to_folder_id is not None:
+        params["tofolderid"] = to_folder_id
+
+    logger.info(f"Renaming/moving folder: {folder_id or path}")
+
+    try:
+        result = await auth.make_request("renamefolder", params)
+        logger.info(f"Folder renamed/moved successfully")
+        return result
+    except ValueError as e:
+        return {"error": str(e)}
+
+
+@mcp.tool()
+async def delete_folder(
+    folder_id: int | None = None,
+    path: str | None = None,
+    recursive: bool = False,
+) -> dict[str, Any]:
+    """
+    Delete a folder in pCloud (moves to trash, not permanent).
+
+    Deleted folders can be restored from trash using list_trash and restore_from_trash.
+
+    Args:
+        folder_id: The folder ID to delete
+        path: The folder path to delete (alternative to folder_id)
+        recursive: If True, delete folder and all contents. If False (default),
+                   folder must be empty.
+
+    Returns:
+        Dictionary with deletion result. For recursive delete, includes counts
+        of deleted files and folders.
+
+    Note:
+        Files are moved to trash, not permanently deleted. Use clear_trash
+        for permanent deletion.
+    """
+    if folder_id is None and path is None:
+        return {"error": "Either folder_id or path must be provided"}
+
+    params: dict[str, Any] = {}
+
+    if folder_id is not None:
+        params["folderid"] = folder_id
+    else:
+        params["path"] = path
+
+    method = "deletefolderrecursive" if recursive else "deletefolder"
+    logger.info(f"Deleting folder {'recursively ' if recursive else ''}: {folder_id or path}")
+
+    try:
+        result = await auth.make_request(method, params)
+        logger.info(f"Folder deleted successfully (moved to trash)")
+        return {
+            "success": True,
+            "message": "Folder moved to trash",
+            "result": result,
+        }
+    except ValueError as e:
+        return {"error": str(e)}
+
+
+# =============================================================================
+# File Operations (rename, move, delete)
+# =============================================================================
+
+
+@mcp.tool()
+async def rename_file(
+    file_id: int | None = None,
+    path: str | None = None,
+    new_name: str | None = None,
+    to_path: str | None = None,
+    to_folder_id: int | None = None,
+) -> dict[str, Any]:
+    """
+    Rename or move a file in pCloud.
+
+    You can rename a file, move it to a different folder, or both at once.
+    If destination file exists, it will be replaced atomically.
+
+    Args:
+        file_id: The file ID to rename/move
+        path: The file path to rename/move (alternative to file_id)
+        new_name: New name for the file (for renaming)
+        to_path: Destination path (for moving). Must end with "/" if just moving.
+        to_folder_id: Destination folder ID (for moving)
+
+    Returns:
+        Dictionary with the updated file metadata
+
+    Examples:
+        Rename: rename_file(file_id=123, new_name="new_name.txt")
+        Move: rename_file(file_id=123, to_folder_id=456)
+        Both: rename_file(path="/old.txt", new_name="new.txt", to_path="/Destination/")
+    """
+    if file_id is None and path is None:
+        return {"error": "Either file_id or path must be provided"}
+
+    if new_name is None and to_path is None and to_folder_id is None:
+        return {"error": "At least one destination parameter required: new_name, to_path, or to_folder_id"}
+
+    params: dict[str, Any] = {}
+
+    if file_id is not None:
+        params["fileid"] = file_id
+    else:
+        params["path"] = path
+
+    if new_name is not None:
+        params["toname"] = new_name
+    if to_path is not None:
+        params["topath"] = to_path
+    if to_folder_id is not None:
+        params["tofolderid"] = to_folder_id
+
+    logger.info(f"Renaming/moving file: {file_id or path}")
+
+    try:
+        result = await auth.make_request("renamefile", params)
+        logger.info(f"File renamed/moved successfully")
+        return result
+    except ValueError as e:
+        return {"error": str(e)}
+
+
+@mcp.tool()
+async def delete_file(
+    file_id: int | None = None,
+    path: str | None = None,
+) -> dict[str, Any]:
+    """
+    Delete a file in pCloud (moves to trash, not permanent).
+
+    Deleted files can be restored from trash using list_trash and restore_from_trash.
+
+    Args:
+        file_id: The file ID to delete
+        path: The file path to delete (alternative to file_id)
+
+    Returns:
+        Dictionary with the deleted file metadata
+
+    Note:
+        Files are moved to trash, not permanently deleted. Use clear_trash
+        for permanent deletion.
+    """
+    if file_id is None and path is None:
+        return {"error": "Either file_id or path must be provided"}
+
+    params: dict[str, Any] = {}
+
+    if file_id is not None:
+        params["fileid"] = file_id
+    else:
+        params["path"] = path
+
+    logger.info(f"Deleting file: {file_id or path}")
+
+    try:
+        result = await auth.make_request("deletefile", params)
+        logger.info(f"File deleted successfully (moved to trash)")
+        return {
+            "success": True,
+            "message": "File moved to trash",
+            "metadata": result.get("metadata", {}),
+        }
+    except ValueError as e:
+        return {"error": str(e)}
+
+
+# =============================================================================
+# Trash Operations
+# =============================================================================
+
+
+@mcp.tool()
+async def list_trash(
+    folder_id: int = 0,
+    recursive: bool = True,
+) -> dict[str, Any]:
+    """
+    List files and folders in the trash.
+
+    Args:
+        folder_id: Folder ID to list trash contents from (default: 0 for root)
+        recursive: If True (default), list all trash contents recursively
+
+    Returns:
+        Dictionary with trash contents including file/folder metadata
+    """
+    params: dict[str, Any] = {"folderid": folder_id}
+
+    if recursive:
+        params["recursive"] = 1
+
+    logger.info(f"Listing trash contents")
+
+    try:
+        result = await auth.make_request("trash_list", params)
+        return result
+    except ValueError as e:
+        return {"error": str(e)}
+
+
+@mcp.tool()
+async def restore_from_trash(
+    file_id: int | None = None,
+    folder_id: int | None = None,
+    restore_to_path: str | None = None,
+) -> dict[str, Any]:
+    """
+    Restore a file or folder from trash.
+
+    Args:
+        file_id: The file ID to restore (from trash listing)
+        folder_id: The folder ID to restore (from trash listing)
+        restore_to_path: Optional path to restore to. If not provided,
+                         restores to original location.
+
+    Returns:
+        Dictionary with the restored item metadata
+    """
+    if file_id is None and folder_id is None:
+        return {"error": "Either file_id or folder_id must be provided"}
+
+    params: dict[str, Any] = {}
+
+    if file_id is not None:
+        params["fileid"] = file_id
+    if folder_id is not None:
+        params["folderid"] = folder_id
+
+    # Use restore to path if specified, otherwise restore to original location
+    if restore_to_path is not None:
+        method = "trash_restorepath"
+        params["topath"] = restore_to_path
+    else:
+        method = "trash_restore"
+
+    logger.info(f"Restoring from trash: file_id={file_id}, folder_id={folder_id}")
+
+    try:
+        result = await auth.make_request(method, params)
+        logger.info(f"Item restored from trash successfully")
+        return {
+            "success": True,
+            "message": "Item restored from trash",
+            "result": result,
+        }
+    except ValueError as e:
+        return {"error": str(e)}
