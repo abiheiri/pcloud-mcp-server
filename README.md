@@ -40,6 +40,10 @@ An MCP (Model Context Protocol) server that provides tools for interacting with 
 
 ## Usage with Claude Desktop
 
+There are three ways to run this server with Claude Desktop.
+
+### Option 1: Run with uv (simplest for development)
+
 Add the following to your Claude Desktop configuration file:
 
 - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
@@ -65,11 +69,68 @@ Add the following to your Claude Desktop configuration file:
 }
 ```
 
-Replace:
+Replace `/path/to/uv` with your uv path (find with `which uv`) and `/path/to/pcloud_mcp` with the repository path.
 
-- `/path/to/uv` with the actual path to your `uv` executable (find it with `which uv`)
-- `/path/to/pcloud_mcp` with the actual path to this repository
-- Credentials with your actual pCloud account details
+### Option 2: Run with Docker directly
+
+First, build the Docker image:
+
+```bash
+docker build -t pcloud-mcp:1.0 .
+```
+
+Then add to your Claude Desktop config:
+
+```json
+{
+  "mcpServers": {
+    "pcloud": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "-e", "PCLOUD_USERNAME=youremail@example.com",
+        "-e", "PCLOUD_PASSWORD=yourpassword",
+        "-e", "PCLOUD_REGION=us",
+        "pcloud-mcp:1.0"
+      ]
+    }
+  }
+}
+```
+
+### Option 3: Use Docker MCP Gateway (recommended for Docker Desktop users)
+
+If you have Docker Desktop with MCP Gateway, you can register the server once and manage it through Docker.
+
+1. Build the image:
+   ```bash
+   docker build -t pcloud-mcp:1.0 .
+   ```
+
+2. Import the catalog:
+   ```bash
+   docker mcp catalog import catalog.yaml
+   ```
+   Enter a name like `pcloud-local` when prompted.
+
+3. Enable the server:
+   ```bash
+   docker mcp server enable pcloud
+   ```
+
+4. Set your credentials:
+   ```bash
+   docker mcp secret set pcloud.username=youremail@example.com
+   docker mcp secret set pcloud.password=yourpassword
+   docker mcp secret set pcloud.region=us
+   ```
+
+5. Connect Claude Desktop to the gateway (if not already):
+   ```bash
+   docker mcp client connect claude-desktop
+   ```
+
+The server will now appear automatically in Claude Desktop. Docker manages the container lifecycle, starting it when needed and stopping it when idle.
 
 ## What You Can Do
 

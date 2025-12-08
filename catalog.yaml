@@ -1,0 +1,23 @@
+registry:
+    pcloud:
+        title: pCloud
+        description: MCP server for interacting with pCloud cloud storage - list folders, upload/download files, rename, move, delete, and manage trash.
+        image: pcloud-mcp:1.0
+        type: server
+        secrets:
+            - name: pcloud.username
+              env: PCLOUD_USERNAME
+              description: Your pCloud account email
+            - name: pcloud.password
+              env: PCLOUD_PASSWORD
+              description: Your pCloud account password
+            - name: pcloud.region
+              env: PCLOUD_REGION
+              description: API region (us or eu)
+        metadata:
+            category: storage
+            owner: abiheiri
+            tags:
+                - pcloud
+                - cloud-storage
+                - files
