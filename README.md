@@ -103,22 +103,27 @@ Then add to your Claude Desktop config:
 If you have Docker Desktop with MCP Gateway, you can register the server once and manage it through Docker.
 
 1. Build the image:
+
    ```bash
    docker build -t pcloud-mcp:1.0 .
    ```
 
 2. Import the catalog:
+
    ```bash
    docker mcp catalog import catalog.yaml
    ```
+
    Enter a name like `pcloud-local` when prompted.
 
 3. Enable the server:
+
    ```bash
    docker mcp server enable pcloud
    ```
 
 4. Set your credentials:
+
    ```bash
    docker mcp secret set pcloud.username=youremail@example.com
    docker mcp secret set pcloud.password=yourpassword
@@ -126,6 +131,7 @@ If you have Docker Desktop with MCP Gateway, you can register the server once an
    ```
 
 5. Connect Claude Desktop to the gateway (if not already):
+
    ```bash
    docker mcp client connect claude-desktop
    ```
